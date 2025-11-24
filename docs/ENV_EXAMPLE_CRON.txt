@@ -1,0 +1,38 @@
+# ============================================
+# CONFIGURACIÓN PARA NOTIFICACIONES DE VENCIMIENTOS
+# ============================================
+
+# Email donde se enviarán las notificaciones de vencimientos
+EXPIRY_NOTIFICATION_EMAIL=admin@tuempresa.com
+
+# ============================================
+# CONFIGURACIÓN DE CORREO ELECTRÓNICO (SMTP)
+# ============================================
+
+# Mailer a usar (smtp, sendmail, mailgun, ses, log, array)
+MAIL_MAILER=smtp
+
+# Configuración SMTP
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=tu_email@gmail.com
+MAIL_PASSWORD=tu_contraseña_de_aplicacion
+MAIL_ENCRYPTION=tls
+
+# Remitente del email
+MAIL_FROM_ADDRESS=noreply@tuempresa.com
+MAIL_FROM_NAME="Sistema de Auditorías"
+
+# ============================================
+# EJEMPLO PARA GMAIL
+# ============================================
+# 1. Habilitar "Verificación en 2 pasos" en tu cuenta de Google
+# 2. Generar una "Contraseña de aplicación" en: https://myaccount.google.com/apppasswords
+# 3. Usar la contraseña de aplicación en MAIL_PASSWORD
+
+# ============================================
+# EJEMPLO PARA DESARROLLO (guardar en logs)
+# ============================================
+# MAIL_MAILER=log
+# MAIL_LOG_CHANNEL=stack
+
