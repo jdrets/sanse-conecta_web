@@ -1,0 +1,30 @@
+# Variables de entorno para simulación de latencia
+
+# Agregar estas líneas a tu archivo .env
+
+# ============================================
+# SIMULACIÓN DE LATENCIA (Solo desarrollo)
+# ============================================
+
+# Activar/desactivar simulación de latencia
+SIMULATE_LATENCY=true
+
+# Tiempo de latencia en milisegundos
+# 500ms = Conexión rápida
+# 1000ms = Conexión normal (recomendado)
+# 2000ms = Conexión lenta
+# 3000ms = Conexión muy lenta
+SIMULATE_LATENCY_MS=1000
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+# - Solo usar en desarrollo local
+# - NUNCA activar en producción
+# - Útil para probar:
+#   * Estados de loading
+#   * Spinners y skeletons
+#   * Feedback visual
+#   * Race conditions
+#   * Optimistic updates
+

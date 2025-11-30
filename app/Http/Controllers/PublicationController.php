@@ -38,10 +38,27 @@ class PublicationController extends Controller
         $query = Publication::query()
             ->with(['user', 'category'])
             ->active();
+        $selectedCategory = null;
 
         // Búsqueda por categoría
         if ($request->has('category_id') && $request->category_id) {
-            $query->where('category_id', $request->category_id);
+            $categoryId = $request->category_id;
+            
+            // Obtener la categoría seleccionada
+            $selectedCategory = Category::find($categoryId);
+            
+            if ($selectedCategory) {
+                // Si es una categoría padre (no tiene parent_id)
+                if (is_null($selectedCategory->parent_id)) {
+                    // Buscar publicaciones de esta categoría Y de todas sus subcategorías
+                    $childCategoryIds = Category::where('parent_id', $categoryId)->pluck('id')->toArray();
+                    $allCategoryIds = array_merge([$categoryId], $childCategoryIds);
+                    $query->whereIn('category_id', $allCategoryIds);
+                } else {
+                    // Si es una subcategoría, buscar solo por esa categoría específica
+                    $query->where('category_id', $categoryId);
+                }
+            }
         }
 
         // Búsqueda por texto
@@ -68,6 +85,7 @@ class PublicationController extends Controller
             'publications' => $publications,
             'categories' => $categories,
             'filters' => $request->only(['search', 'category_id']),
+            'selectedCategory' => $selectedCategory,
         ]);
     }
 

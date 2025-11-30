@@ -5,9 +5,11 @@ Una aplicación web moderna construida con Laravel 12, Inertia.js y React.
 ## 🚀 Tecnologías utilizadas
 
 - **Backend**: Laravel 12
-- **Frontend**: React 18 + Inertia.js
+- **Frontend**: React 18 + Inertia.js + TypeScript
+- **UI**: Material-UI (MUI) v7
+- **State Management**: React Query (TanStack Query)
 - **Build Tool**: Vite
-- **Base de datos**: SQLite (por defecto)
+- **Base de datos**: MySQL
 
 ## 📋 Requisitos previos
 
@@ -19,40 +21,57 @@ Una aplicación web moderna construida con Laravel 12, Inertia.js y React.
 ## 🛠️ Instalación
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone <tu-repositorio>
 cd app_consultora_industrial
 ```
 
 ### 2. Instalar dependencias de PHP
+
 ```bash
 composer install
 ```
 
 ### 3. Configurar variables de entorno
+
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
 ### 4. Configurar base de datos
-Edita el archivo `.env` y configura tu base de datos:
+
+Edita el archivo `.env` y configura tu base de datos MySQL:
+
 ```env
-DB_CONNECTION=sqlite
-DB_DATABASE=/absolute/path/to/your/project/database/database.sqlite
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sanse_conecta
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-### 5. Ejecutar migraciones
+### 5. Ejecutar migraciones y seeders
+
 ```bash
-php artisan migrate
+php artisan migrate:fresh --seed
 ```
+
+Esto creará:
+
+- Tabla de usuarios con usuarios de prueba
+- **8 categorías padre** con **73+ subcategorías** de servicios
 
 ### 6. Instalar dependencias de Node.js
+
 ```bash
 npm install
 ```
 
 ### 7. Compilar assets
+
 ```bash
 npm run build
 ```
@@ -60,6 +79,7 @@ npm run build
 ## 🚀 Desarrollo
 
 ### Iniciar servidor de desarrollo
+
 ```bash
 # Terminal 1: Servidor Laravel
 php artisan serve
@@ -69,6 +89,7 @@ npm run dev
 ```
 
 ### Compilar para producción
+
 ```bash
 npm run build
 ```
@@ -101,25 +122,28 @@ app_consultora_industrial/
 ## 🎨 Crear nuevas páginas
 
 ### 1. Crear componente React
+
 ```jsx
 // resources/js/Pages/About.jsx
-import React from 'react';
+import React from "react";
 
 export default function About() {
-    return (
-        <div>
-            <h1>Acerca de nosotros</h1>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Acerca de nosotros</h1>
+    </div>
+  );
 }
 ```
 
 ### 2. Crear controlador
+
 ```bash
 php artisan make:controller AboutController
 ```
 
 ### 3. Configurar controlador
+
 ```php
 // app/Http/Controllers/AboutController.php
 use Inertia\Inertia;
@@ -131,12 +155,15 @@ public function index()
 ```
 
 ### 4. Agregar ruta
+
 ```php
 // routes/web.php
 Route::get('/about', [AboutController::class, 'index']);
 ```
 
 ## 🔧 Comandos útiles
+
+### Comandos generales
 
 ```bash
 # Limpiar caché
@@ -159,6 +186,34 @@ php artisan migrate
 # Revertir última migración
 php artisan migrate:rollback
 ```
+
+### 🧪 Simulación de latencia (Testing)
+
+Útil para probar estados de loading, spinners y UX en conexiones lentas:
+
+```bash
+# Activar con 1.5 segundos de latencia
+php artisan latency:toggle on --ms=1500
+php artisan config:clear
+
+# Ver estado actual
+php artisan latency:toggle status
+
+# Desactivar
+php artisan latency:toggle off
+php artisan config:clear
+```
+
+**Presets recomendados:**
+
+- `--ms=500` → Conexión rápida
+- `--ms=1000` → Conexión normal (por defecto)
+- `--ms=2000` → Conexión lenta (3G)
+- `--ms=3500` → Testing extremo
+
+📖 Ver documentación completa: [`docs/QUICK_START_LATENCY.md`](docs/QUICK_START_LATENCY.md)
+
+⚠️ **IMPORTANTE**: Solo usar en desarrollo. Nunca activar en producción.
 
 ## 📚 Recursos adicionales
 

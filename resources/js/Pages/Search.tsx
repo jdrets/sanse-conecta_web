@@ -41,17 +41,21 @@ interface SearchProps {
     search?: string;
     category_id?: number;
   };
+  selectedCategory?: ICategory;
 }
 
 export default function Search({
   publications,
   categories,
   filters,
+  selectedCategory,
 }: SearchProps) {
   const user = useAuth();
   const [searchQuery, setSearchQuery] = useState(filters.search || "");
-  const [categoryId, setCategoryId] = useState(filters.category_id || "");
-  const [selectedParent, setSelectedParent] = useState<number | "">("");
+  const [categoryId, setCategoryId] = useState(selectedCategory?.id || "");
+  const [selectedParent, setSelectedParent] = useState<number | "">(
+    selectedCategory?.parent_id || selectedCategory?.id || ""
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // Encontrar la categoría padre si hay un filtro de categoría
@@ -76,8 +80,8 @@ export default function Search({
   };
 
   const handleParentChange = (parentId: number | "") => {
-    setSelectedParent(parentId);
-    setCategoryId(""); // Resetear subcategoría
+    setSelectedParent(parentId || selectedCategory?.id || "");
+    setCategoryId(parentId || selectedCategory?.id || ""); // Resetear subcategoría
     // No hacer búsqueda aquí, solo cambiar el estado
   };
 

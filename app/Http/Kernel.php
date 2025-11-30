@@ -28,6 +28,8 @@ class Kernel extends HttpKernel
      * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
+        // NOTA: En Laravel 11, el grupo 'web' se configura en bootstrap/app.php
+        // Este array se mantiene por compatibilidad pero no se usa para 'web'
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,

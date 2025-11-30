@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Simulate Latency (Development/Testing)
+    |--------------------------------------------------------------------------
+    |
+    | Simula latencia de red para probar estados de loading, spinners y UX.
+    | SOLO para desarrollo. NUNCA activar en producción.
+    |
+    */
+
+    'simulate_latency' => (bool) env('SIMULATE_LATENCY', false),
+    'simulate_latency_ms' => (int) env('SIMULATE_LATENCY_MS', 1000),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |

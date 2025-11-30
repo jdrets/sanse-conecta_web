@@ -19,6 +19,16 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 // Ruta principal (Home)
 Route::get('/', [PublicationController::class, 'home'])->name('home');
 
+// Ruta de prueba para verificar latencia (útil para testing)
+Route::get('/test-latency', function () {
+    return response()->json([
+        'message' => 'Latency test',
+        'timestamp' => now()->toIso8601String(),
+        'latency_enabled' => config('app.simulate_latency'),
+        'latency_ms' => config('app.simulate_latency_ms'),
+    ]);
+});
+
 // Búsqueda de clasificados (pública)
 Route::get('/search', [PublicationController::class, 'search'])->name('publication.search');
 
