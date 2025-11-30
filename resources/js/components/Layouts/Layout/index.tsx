@@ -20,6 +20,10 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { router } from "@inertiajs/react";
 import logo from "../../../assets/logo.png";
+import {
+  LoginOutlined as LoginIcon,
+  PersonAddOutlined as PersonAddIcon,
+} from "@mui/icons-material";
 
 export const MainLayout = ({
   children,
@@ -61,9 +65,10 @@ export const MainLayout = ({
               <>
                 <Button
                   color="inherit"
+                  size="small"
                   onClick={() => router.get("/publication/create")}
+                  startIcon={<AddIcon />}
                 >
-                  <AddIcon sx={{ mr: 1 }} />
                   Publicar Clasificado
                 </Button>
                 <IconButton
@@ -118,13 +123,19 @@ export const MainLayout = ({
               <>
                 <Button
                   color="inherit"
+                  size="small"
                   onClick={() => router.get("/auth/login")}
+                  startIcon={<LoginIcon />}
+                  sx={{ p: 1 }}
                 >
                   Iniciar Sesión
                 </Button>
                 <Button
                   color="inherit"
+                  size="small"
                   onClick={() => router.get("/auth/register")}
+                  startIcon={<PersonAddIcon />}
+                  sx={{ p: 1 }}
                 >
                   Registrarse
                 </Button>
