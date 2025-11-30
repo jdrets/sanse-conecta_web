@@ -27,6 +27,7 @@ import {
 } from "@mui/icons-material";
 import { IPublication, ICategory } from "@/types/publication.interface";
 import { IUser } from "@/types/user.interface";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PublicationEditProps {
   publication: IPublication;
@@ -39,8 +40,7 @@ export default function PublicationEdit({
   categories,
   usedCategories,
 }: PublicationEditProps) {
-  const { auth } = usePage().props as any;
-  const user = auth?.user as IUser | null;
+  const user = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     publication.image ? `/storage/${publication.image}` : null
@@ -86,7 +86,8 @@ export default function PublicationEdit({
   };
 
   const availableCategories = categories.filter(
-    (cat) => !usedCategories.includes(cat.id) || cat.id === publication.category_id
+    cat =>
+      !usedCategories.includes(cat.id) || cat.id === publication.category_id
   );
 
   return (
@@ -148,12 +149,12 @@ export default function PublicationEdit({
                     <Select
                       value={data.category_id}
                       label="Categoría"
-                      onChange={(e) =>
+                      onChange={e =>
                         setData("category_id", e.target.value as number)
                       }
                       required
                     >
-                      {availableCategories.map((category) => (
+                      {availableCategories.map(category => (
                         <MenuItem key={category.id} value={category.id}>
                           {category.icon} {category.name}
                         </MenuItem>
@@ -172,7 +173,7 @@ export default function PublicationEdit({
                     fullWidth
                     label="Título"
                     value={data.title}
-                    onChange={(e) => setData("title", e.target.value)}
+                    onChange={e => setData("title", e.target.value)}
                     error={!!errors.title}
                     helperText={errors.title}
                     required
@@ -186,7 +187,7 @@ export default function PublicationEdit({
                     multiline
                     rows={6}
                     value={data.description}
-                    onChange={(e) => setData("description", e.target.value)}
+                    onChange={e => setData("description", e.target.value)}
                     error={!!errors.description}
                     helperText={errors.description}
                     required
@@ -238,7 +239,9 @@ export default function PublicationEdit({
                     <Button
                       variant="outlined"
                       size="large"
-                      onClick={() => router.get(`/publication/${publication.id}`)}
+                      onClick={() =>
+                        router.get(`/publication/${publication.id}`)
+                      }
                       disabled={processing}
                     >
                       Cancelar
@@ -253,4 +256,3 @@ export default function PublicationEdit({
     </Box>
   );
 }
-

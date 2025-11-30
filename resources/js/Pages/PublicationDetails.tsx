@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { router, usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -14,7 +16,7 @@ import {
   IconButton,
   Menu,
   MenuItem as MenuItemComponent,
-  Grid,
+  Stack,
   Divider,
   Paper,
 } from "@mui/material";
@@ -30,21 +32,48 @@ import {
   Delete as DeleteIcon,
 } from "@mui/icons-material";
 import { IPublication } from "@/types/publication.interface";
-import { IUser } from "@/types/user.interface";
+import { useAuth } from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 interface PublicationDetailsProps {
   publication: IPublication;
   isLiked: boolean;
 }
 
+interface LikeResponse {
+  success: boolean;
+  message: string;
+  liked: boolean;
+  likes_count: number;
+}
+
 export default function PublicationDetails({
   publication,
   isLiked,
 }: PublicationDetailsProps) {
-  const { auth } = usePage().props as any;
-  const user = auth?.user as IUser | null;
+  const user = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [liked, setLiked] = useState(isLiked);
+  const [likesCount, setLikesCount] = useState(publication.likes_count);
+
+  const likeMutation = useMutation({
+    mutationFn: async (publicationId: number) => {
+      const response = await axios.post<LikeResponse>(
+        `/publication/${publicationId}/like`
+      );
+      return response.data;
+    },
+    onSuccess: data => {
+      setLiked(data.liked);
+      setLikesCount(data.likes_count);
+      toast.success(data.message);
+    },
+    onError: (error: any) => {
+      const message =
+        error.response?.data?.message || "Error al procesar la solicitud";
+      toast.error(message);
+    },
+  });
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -63,11 +92,8 @@ export default function PublicationDetails({
       router.get("/auth/login");
       return;
     }
-    router.post(`/publication/${publication.id}/like`, {}, {
-      onSuccess: () => {
-        setLiked(!liked);
-      },
-    });
+
+    likeMutation.mutate(publication.id);
   };
 
   const handleEdit = () => {
@@ -137,9 +163,13 @@ export default function PublicationDetails({
       </AppBar>
 
       <Container sx={{ py: 4 }}>
-        <Grid container spacing={3}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={3}
+          alignItems="flex-start"
+        >
           {/* Publication Image and Details */}
-          <Grid item xs={12} md={8}>
+          <Box sx={{ flex: { xs: 1, md: 2 }, width: "100%" }}>
             <Card>
               {publication.image && (
                 <CardMedia
@@ -185,23 +215,29 @@ export default function PublicationDetails({
                   <Button
                     variant={liked ? "contained" : "outlined"}
                     color="error"
-                    startIcon={liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    startIcon={
+                      liked ? <FavoriteIcon /> : <FavoriteBorderIcon />
+                    }
                     onClick={handleLike}
+                    disabled={likeMutation.isPending}
                   >
-                    {liked ? "Te gusta" : "Me gusta"}
+                    {likeMutation.isPending
+                      ? "Procesando..."
+                      : liked
+                        ? "Te gusta"
+                        : "Me gusta"}
                   </Button>
                   <Typography variant="body2" color="text.secondary">
-                    {publication.likes_count}{" "}
-                    {publication.likes_count === 1 ? "persona" : "personas"} le gusta
-                    esto
+                    {likesCount} {likesCount === 1 ? "persona" : "personas"} le
+                    gusta esto
                   </Typography>
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
           {/* Contact Information */}
-          <Grid item xs={12} md={4}>
+          <Box sx={{ flex: { xs: 1, md: 1 }, width: "100%" }}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Información de Contacto
@@ -217,21 +253,27 @@ export default function PublicationDetails({
                   {publication.user.email && (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <EmailIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">{publication.user.email}</Typography>
+                      <Typography variant="body2">
+                        {publication.user.email}
+                      </Typography>
                     </Box>
                   )}
 
                   {publication.user.phone && (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">{publication.user.phone}</Typography>
+                      <Typography variant="body2">
+                        {publication.user.phone}
+                      </Typography>
                     </Box>
                   )}
 
                   {publication.user.address && (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                       <LocationIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">{publication.user.address}</Typography>
+                      <Typography variant="body2">
+                        {publication.user.address}
+                      </Typography>
                     </Box>
                   )}
 
@@ -246,10 +288,9 @@ export default function PublicationDetails({
                 </>
               )}
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
+        </Stack>
       </Container>
     </Box>
   );
 }
-

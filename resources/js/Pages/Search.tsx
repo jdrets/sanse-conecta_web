@@ -29,8 +29,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import { IPublication, ICategory } from "@/types/publication.interface";
-import { IUser } from "@/types/user.interface";
-
+import { useAuth } from "@/hooks/useAuth";
 interface SearchProps {
   publications: {
     data: IPublication[];
@@ -44,9 +43,12 @@ interface SearchProps {
   };
 }
 
-export default function Search({ publications, categories, filters }: SearchProps) {
-  const { auth } = usePage().props as any;
-  const user = auth?.user as IUser | null;
+export default function Search({
+  publications,
+  categories,
+  filters,
+}: SearchProps) {
+  const user = useAuth();
   const [searchQuery, setSearchQuery] = useState(filters.search || "");
   const [categoryId, setCategoryId] = useState(filters.category_id || "");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -144,7 +146,7 @@ export default function Search({ publications, categories, filters }: SearchProp
                     fullWidth
                     placeholder="Buscar clasificados..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     InputProps={{
                       endAdornment: (
                         <IconButton type="submit" color="primary">
@@ -160,10 +162,10 @@ export default function Search({ publications, categories, filters }: SearchProp
                     <Select
                       value={categoryId}
                       label="Categoría"
-                      onChange={(e) => handleCategoryChange(e.target.value)}
+                      onChange={e => handleCategoryChange(e.target.value)}
                     >
                       <MenuItem value="">Todas las categorías</MenuItem>
-                      {categories.map((category) => (
+                      {categories.map(category => (
                         <MenuItem key={category.id} value={category.id}>
                           {category.icon} {category.name}
                         </MenuItem>
@@ -189,7 +191,7 @@ export default function Search({ publications, categories, filters }: SearchProp
           </Box>
         ) : (
           <Grid container spacing={3}>
-            {publications.data.map((publication) => (
+            {publications.data.map(publication => (
               <Grid item xs={12} sm={6} md={4} key={publication.id}>
                 <Card
                   sx={{
@@ -240,11 +242,15 @@ export default function Search({ publications, categories, filters }: SearchProp
                   <CardActions>
                     <Button
                       size="small"
-                      onClick={() => router.get(`/publication/${publication.id}`)}
+                      onClick={() =>
+                        router.get(`/publication/${publication.id}`)
+                      }
                     >
                       Ver Detalles
                     </Button>
-                    <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
+                    <Box
+                      sx={{ ml: "auto", display: "flex", alignItems: "center" }}
+                    >
                       <FavoriteIcon fontSize="small" color="error" />
                       <Typography variant="body2" sx={{ ml: 0.5 }}>
                         {publication.likes_count}
