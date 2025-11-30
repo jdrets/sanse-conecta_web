@@ -12,9 +12,11 @@ import {
   Stack,
   MenuItem,
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
+import { Search as SearchIcon, Add as AddIcon } from "@mui/icons-material";
 import { ICategory } from "@/types/publication.interface";
 import { MainLayout } from "@/components/Layouts/Layout";
+import logo from "../assets/logo.png";
 
 interface HomeProps {
   categories: ICategory[];
@@ -26,8 +28,10 @@ export default function Home({ categories }: HomeProps) {
   );
   const [selectedSubcategory, setSelectedSubcategory] =
     useState<ICategory | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     router.get("/search", {
       category_id: selectedSubcategory?.id ?? selectedCategory?.id,
@@ -63,63 +67,87 @@ export default function Home({ categories }: HomeProps) {
         }}
       >
         <Container maxWidth="md">
-          <Typography variant="h2" component="h1" gutterBottom align="center">
-            Hola!
-          </Typography>
-          <Typography variant="body1" align="center" sx={{ mb: 4 }}>
-            Encuentra servicios, productos y mucho más en tu comunidad
-          </Typography>
+          <Stack spacing={3} alignItems="center">
+            <Stack spacing={2} alignItems="center">
+              <Box
+                component="img"
+                src={logo}
+                alt="Sanse Conecta"
+                sx={{ height: 100 }}
+              />
+              <Typography variant="body1" align="center" sx={{ mb: 4 }}>
+                Encuentra lo que necesitas en tu comunidad
+              </Typography>
+            </Stack>
 
-          {/* Search Bar */}
-          <Box component="form" onSubmit={handleSearch}>
-            <Card>
-              <Stack spacing={2}>
-                <FormControl fullWidth>
-                  <InputLabel>Categoría</InputLabel>
-                  <Select
-                    label="Categoría"
-                    fullWidth
-                    onChange={handleCategoryChange}
-                    value={selectedCategory?.id || ""}
-                  >
-                    {categories.map(category => (
-                      <MenuItem key={category.id} value={category.id}>
-                        {category.icon} {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+            <Stack spacing={4}>
+              {/* Search Bar */}
+              <Box component="form" onSubmit={handleSearch}>
+                <Card>
+                  <Stack spacing={2}>
+                    <FormControl fullWidth>
+                      <InputLabel>Categoría</InputLabel>
+                      <Select
+                        label="Categoría"
+                        fullWidth
+                        onChange={handleCategoryChange}
+                        value={selectedCategory?.id || ""}
+                      >
+                        {categories.map(category => (
+                          <MenuItem key={category.id} value={category.id}>
+                            {category.icon} {category.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-                <FormControl fullWidth>
-                  <InputLabel>Subcategoría</InputLabel>
-                  <Select
-                    label="Subcategoría"
-                    fullWidth
-                    onChange={handleSubcategoryChange}
-                    value={selectedSubcategory?.id || ""}
-                    disabled={!selectedCategory}
-                  >
-                    <MenuItem value="">Todas</MenuItem>
-                    {selectedCategory?.children?.map(category => (
-                      <MenuItem key={category.id} value={category.id}>
-                        {category.icon} {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                    <FormControl fullWidth>
+                      <InputLabel>Subcategoría</InputLabel>
+                      <Select
+                        label="Subcategoría"
+                        fullWidth
+                        onChange={handleSubcategoryChange}
+                        value={selectedSubcategory?.id || ""}
+                        disabled={!selectedCategory}
+                      >
+                        <MenuItem value="">Todas</MenuItem>
+                        {selectedCategory?.children?.map(category => (
+                          <MenuItem key={category.id} value={category.id}>
+                            {category.icon} {category.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
+                    <LoadingButton
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSearch}
+                      disabled={!selectedCategory}
+                      loading={loading}
+                      startIcon={<SearchIcon />}
+                    >
+                      Buscar
+                    </LoadingButton>
+                  </Stack>
+                </Card>
+              </Box>
+
+              <Stack spacing={1} textAlign="center">
+                <Typography variant="body1" fontWeight={600}>
+                  Estas buscando publicitar tu servicio o producto?
+                </Typography>
                 <Button
                   variant="contained"
-                  color="primary"
-                  onClick={handleSearch}
-                  disabled={!selectedCategory}
+                  color="secondary"
+                  onClick={() => router.get("/publication/create")}
+                  startIcon={<AddIcon />}
                 >
-                  <SearchIcon />
-                  Buscar
+                  Publicar clasificado gratis
                 </Button>
               </Stack>
-            </Card>
-          </Box>
+            </Stack>
+          </Stack>
         </Container>
       </Box>
     </MainLayout>

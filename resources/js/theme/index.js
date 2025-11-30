@@ -85,13 +85,13 @@ export const theme = createTheme({
   typography: {
     fontFamily: ["Inter", "Roboto", "sans-serif"].join(","),
     h1: { fontWeight: 700 },
-    h2: { fontWeight: 600 },
+    h2: { fontWeight: 600, fontSize: "32px" },
     h3: { fontWeight: 600 },
     h4: { fontWeight: 600 },
     h5: { fontWeight: 500 },
     h6: { fontWeight: 500 },
-    body1: { fontSize: "0.9375rem" },
-    body2: { fontSize: "0.8125rem" },
+    body1: { fontSize: "16px" },
+    body2: { fontSize: "14px" },
     button: { textTransform: "none", fontWeight: 600 },
   },
   components: {

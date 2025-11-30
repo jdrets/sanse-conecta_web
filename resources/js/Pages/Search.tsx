@@ -30,6 +30,7 @@ import {
 } from "@mui/icons-material";
 import { IPublication, ICategory } from "@/types/publication.interface";
 import { useAuth } from "@/hooks/useAuth";
+import { MainLayout } from "../components/Layouts/Layout";
 interface SearchProps {
   publications: {
     data: IPublication[];
@@ -121,61 +122,7 @@ export default function Search({
   };
 
   return (
-    <Box
-      sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}
-    >
-      {/* AppBar */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, cursor: "pointer" }}
-            onClick={() => router.get("/")}
-          >
-            Sanse Conecta
-          </Typography>
-          {user ? (
-            <>
-              <Button
-                color="inherit"
-                onClick={() => router.get("/publication/create")}
-              >
-                <AddIcon sx={{ mr: 1 }} />
-                Publicar Clasificado
-              </Button>
-              <IconButton size="large" onClick={handleMenuOpen} color="inherit">
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItemComponent disabled>
-                  <Typography variant="body2">{user.email}</Typography>
-                </MenuItemComponent>
-                <MenuItemComponent onClick={handleLogout}>
-                  Cerrar Sesión
-                </MenuItemComponent>
-              </Menu>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" onClick={() => router.get("/auth/login")}>
-                Iniciar Sesión
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.get("/auth/register")}
-              >
-                Registrarse
-              </Button>
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
-
+    <MainLayout>
       <Container sx={{ py: 4 }}>
         {/* Search Filters */}
         <Card sx={{ mb: 4 }}>
@@ -341,6 +288,6 @@ export default function Search({
           </Box>
         )}
       </Container>
-    </Box>
+    </MainLayout>
   );
 }

@@ -9,13 +9,10 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  AccountCircle,
-} from "@mui/icons-material";
+import { Add as AddIcon, AccountCircle } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { router } from "@inertiajs/react";
+import logo from "../../../assets/logo.png";
 
 export const MainLayout = ({
   children,
@@ -45,7 +42,13 @@ export const MainLayout = ({
         <AppBar position="sticky">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Sanse Conecta
+              <Box
+                component="img"
+                src={logo}
+                alt="Sanse Conecta"
+                sx={{ height: 40 }}
+                onClick={() => router.get("/")}
+              />
             </Typography>
             {user ? (
               <>
