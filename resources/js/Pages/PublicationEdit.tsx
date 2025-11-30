@@ -91,7 +91,7 @@ export default function PublicationEdit({
   );
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
       {/* AppBar */}
       <AppBar position="static">
         <Toolbar>

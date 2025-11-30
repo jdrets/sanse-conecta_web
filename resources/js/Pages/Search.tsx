@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { router, usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import {
   Box,
   Button,
   Container,
-  Grid,
   TextField,
   Typography,
   Card,
@@ -21,6 +20,7 @@ import {
   IconButton,
   Menu,
   MenuItem as MenuItemComponent,
+  Stack,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -82,7 +82,9 @@ export default function Search({
   };
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+    <Box
+      sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}
+    >
       {/* AppBar */}
       <AppBar position="static">
         <Toolbar>
@@ -140,40 +142,36 @@ export default function Search({
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Box component="form" onSubmit={handleSearch}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    placeholder="Buscar clasificados..."
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton type="submit" color="primary">
-                          <SearchIcon />
-                        </IconButton>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Categoría</InputLabel>
-                    <Select
-                      value={categoryId}
-                      label="Categoría"
-                      onChange={e => handleCategoryChange(e.target.value)}
-                    >
-                      <MenuItem value="">Todas las categorías</MenuItem>
-                      {categories.map(category => (
-                        <MenuItem key={category.id} value={category.id}>
-                          {category.icon} {category.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                <TextField
+                  fullWidth
+                  placeholder="Buscar clasificados..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton type="submit" color="primary">
+                        <SearchIcon />
+                      </IconButton>
+                    ),
+                  }}
+                />
+                <FormControl fullWidth>
+                  <InputLabel>Categoría</InputLabel>
+                  <Select
+                    value={categoryId}
+                    label="Categoría"
+                    onChange={e => handleCategoryChange(e.target.value)}
+                  >
+                    <MenuItem value="">Todas las categorías</MenuItem>
+                    {categories.map(category => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.icon} {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Stack>
             </Box>
           </CardContent>
         </Card>
@@ -190,9 +188,19 @@ export default function Search({
             </Typography>
           </Box>
         ) : (
-          <Grid container spacing={3}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 3,
+            }}
+          >
             {publications.data.map(publication => (
-              <Grid item xs={12} sm={6} md={4} key={publication.id}>
+              <Box key={publication.id}>
                 <Card
                   sx={{
                     height: "100%",
@@ -258,9 +266,9 @@ export default function Search({
                     </Box>
                   </CardActions>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         )}
       </Container>
     </Box>

@@ -57,7 +57,7 @@ export default function Home({ categories }: HomeProps) {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
       {/* AppBar */}
       <AppBar position="static">
         <Toolbar>
@@ -106,7 +106,7 @@ export default function Home({ categories }: HomeProps) {
       {/* Hero Section */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          background: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
           color: "white",
           py: 8,
         }}
