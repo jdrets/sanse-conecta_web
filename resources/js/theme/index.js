@@ -86,8 +86,8 @@ export const theme = createTheme({
     fontFamily: ["Inter", "Roboto", "sans-serif"].join(","),
     h1: { fontWeight: 700 },
     h2: { fontWeight: 600, fontSize: "32px" },
-    h3: { fontWeight: 600 },
-    h4: { fontWeight: 600 },
+    h3: { fontWeight: 600, fontSize: "24px" },
+    h4: { fontWeight: 600, fontSize: "18px" },
     h5: { fontWeight: 500 },
     h6: { fontWeight: 500 },
     body1: { fontSize: "16px" },
@@ -117,7 +117,10 @@ export const theme = createTheme({
         root: {
           textTransform: "none",
           fontWeight: 600,
-          padding: "12px 6px",
+          padding: "10px 16px",
+          "&:hover": {
+            boxShadow: "none",
+          },
         },
       },
     },

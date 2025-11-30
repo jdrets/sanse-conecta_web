@@ -39,7 +39,7 @@ export const MainLayout = ({
   return (
     <Box>
       {!withoutHeader && (
-        <AppBar position="sticky">
+        <AppBar position="sticky" sx={{ boxShadow: "none" }}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <Box

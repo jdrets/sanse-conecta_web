@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { router, useForm, usePage } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import {
   Box,
   Button,
@@ -7,8 +7,6 @@ import {
   Typography,
   Card,
   CardContent,
-  AppBar,
-  Toolbar,
   TextField,
   FormControl,
   InputLabel,
@@ -16,18 +14,11 @@ import {
   MenuItem,
   Grid,
   Alert,
-  IconButton,
-  Menu,
-  MenuItem as MenuItemComponent,
 } from "@mui/material";
-import {
-  AccountCircle,
-  Add as AddIcon,
-  ArrowBack as ArrowBackIcon,
-  CloudUpload as CloudUploadIcon,
-} from "@mui/icons-material";
+import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import { ICategory } from "@/types/publication.interface";
 import { useAuth } from "@/hooks/useAuth";
+import { MainLayout } from "../components/Layouts/Layout";
 
 interface PublicationCreateProps {
   categories: ICategory[];
@@ -90,7 +81,8 @@ export default function PublicationCreate({
   // Filtrar subcategorías basadas en la categoría padre seleccionada
   const childCategories = selectedParent
     ? categories.filter(
-        cat => cat.parent_id === selectedParent && !usedCategories.includes(cat.id)
+        cat =>
+          cat.parent_id === selectedParent && !usedCategories.includes(cat.id)
       )
     : [];
 
@@ -100,43 +92,7 @@ export default function PublicationCreate({
   };
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
-      {/* AppBar */}
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => router.get("/")}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Publicar Clasificado
-          </Typography>
-          {user && (
-            <>
-              <IconButton size="large" onClick={handleMenuOpen} color="inherit">
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItemComponent disabled>
-                  <Typography variant="body2">{user.email}</Typography>
-                </MenuItemComponent>
-                <MenuItemComponent onClick={handleLogout}>
-                  Cerrar Sesión
-                </MenuItemComponent>
-              </Menu>
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
-
+    <MainLayout>
       <Container sx={{ py: 4 }} maxWidth="md">
         <Card>
           <CardContent sx={{ p: 4 }}>
@@ -162,7 +118,9 @@ export default function PublicationCreate({
                     <Select
                       value={selectedParent}
                       label="Categoría Principal"
-                      onChange={e => handleParentChange(e.target.value as number)}
+                      onChange={e =>
+                        handleParentChange(e.target.value as number)
+                      }
                       required
                     >
                       <MenuItem value="">
@@ -290,6 +248,6 @@ export default function PublicationCreate({
           </CardContent>
         </Card>
       </Container>
-    </Box>
+    </MainLayout>
   );
 }
