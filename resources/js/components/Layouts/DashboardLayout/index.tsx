@@ -16,12 +16,12 @@ import {
   MenuItem,
   IconButton,
   Divider,
+  Stack,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { ExpandLess, ExpandMore, Logout } from "@mui/icons-material";
 
 import Logo from "@/assets/logo.png";
-import { BoxRow } from "@/components/BoxRow";
 import { menu } from "./menu";
 import { Link, router } from "@inertiajs/react";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,10 +30,8 @@ const drawerWidth = 248;
 
 export const DashboardLayout = ({
   children,
-  breadcrumbs,
 }: {
   children: React.ReactNode;
-  breadcrumbs: { label: string; href?: string }[];
 }) => {
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -99,17 +97,12 @@ export const DashboardLayout = ({
         <Box sx={{ p: 2 }}>
           {/* Logo */}
           <Link href="/">
-            <BoxRow
-              gap={1.5}
-              sx={{
-                mb: 3,
-              }}
-            >
+            <Stack direction="row" gap={1.5} sx={{ mb: 3 }}>
               <Box component="img" src={Logo} alt="logo" sx={{ height: 40 }} />
               <Typography variant="body1" fontWeight={600}>
                 Consultora industrial
               </Typography>
-            </BoxRow>
+            </Stack>
           </Link>
           {/* OVERVIEW Section */}
           <Typography
@@ -304,27 +297,6 @@ export const DashboardLayout = ({
 
         <Toolbar sx={{ justifyContent: "space-between" }}>
           {/* Left side */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Breadcrumbs
-              sx={{
-                color: "text.primary",
-              }}
-            >
-              {breadcrumbs.map(breadcrumb =>
-                breadcrumb.href ? (
-                  <Link href={breadcrumb.href} key={breadcrumb.label}>
-                    <Typography variant="body1" color="primary">
-                      {breadcrumb.label}
-                    </Typography>
-                  </Link>
-                ) : (
-                  <Typography variant="body1" key={breadcrumb.label}>
-                    {breadcrumb.label}
-                  </Typography>
-                )
-              )}
-            </Breadcrumbs>
-          </Box>
 
           {/* Right side */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -370,11 +342,11 @@ export const DashboardLayout = ({
                 },
               }}
             >
-              <BoxRow gap={1} sx={{ px: 2, py: 1 }}>
+              <Stack direction="row" gap={1} sx={{ px: 2, py: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                   {user.email}
                 </Typography>
-              </BoxRow>
+              </Stack>
               <Divider sx={{ my: 0.5 }} />
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
