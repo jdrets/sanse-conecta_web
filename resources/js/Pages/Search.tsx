@@ -239,7 +239,7 @@ export default function Search({
                             icon={<span>{publication.category.icon}</span>}
                             size="small"
                             color="primary"
-                            sx={{ width: "fit-content" }}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
                           />
                         )}
 
