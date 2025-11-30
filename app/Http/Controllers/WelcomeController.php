@@ -11,7 +11,7 @@ class WelcomeController extends Controller
     {
         $user = auth()->user();
 
-        return Inertia::render('Welcome', [
+        return Inertia::render('home/page', [
             'user' => $user,
         ]);
     }

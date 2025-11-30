@@ -1,4 +1,4 @@
-import { HomeOutlined, PeopleOutline, Security } from "@mui/icons-material";
+import { PeopleOutline, Security } from "@mui/icons-material";
 import { UserRole } from "@/types/user.interface";
 
 export const menu = [

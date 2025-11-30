@@ -9,7 +9,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/clients', [ClientsController::class, 'create']);
 
 // Ruta para cron job - Notificaciones de vencimientos
 Route::post('/cron/expiry-notifications', [AuditsController::class, 'sendExpiryNotifications']);

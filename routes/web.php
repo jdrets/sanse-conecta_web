@@ -13,36 +13,17 @@ Route::get('/auth/login', [AuthController::class, 'loginView'])->name('login');
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Redirección por defecto
-Route::get('/', function () {
-    return redirect('/audits');
-});
+// Route::get('/', function () {
+//     return redirect('/');
+// });
+Route::get('/', [WelcomeController::class, 'index']);
+
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware(['auth'])->group(function () {
-    // Rutas de clientes
-    Route::get('/clients', [ClientsController::class, 'index']);
-    Route::get('/clients/create', [ClientsController::class, 'createView']);
-    Route::post('/clients', [ClientsController::class, 'create']);
-    Route::post('/clients/user-access', [ClientsController::class, 'createUserAccess']);
-    Route::put('/clients/user-access', [ClientsController::class, 'modifyUserAccessPassword']);
-    Route::delete('/clients/user-access', [ClientsController::class, 'deleteUserAccess']);
+   // home rutes
+    
 
-    // Rutas de auditorías
-    Route::get('/audits', [AuditsController::class, 'index']);
-    Route::get('/audits/create', [AuditsController::class, 'createView']);
-    Route::get('/audits/types/{auditTypeId}/items', [AuditsController::class, 'getAuditTypeItems']);
-    Route::get('/audits/types', [AuditTypesController::class, 'typesView']);
-    Route::get('/audits/types/{id}/configuration', [AuditTypesController::class, 'typesConfigurationView']);
-    Route::post('/audits/types/{id}/reorder', [AuditTypesController::class, 'reorderItems']);
-    Route::post('/audits/types/items', [AuditTypesController::class, 'createItem']);
-    Route::put('/audits/types/items/{id}', [AuditTypesController::class, 'editItem']);
-    Route::delete('/audits/types/items/{id}', [AuditTypesController::class, 'deleteItem']);
-
-    // rutas de auditorías
-    Route::post('/audits/create', [AuditsController::class, 'create']);
-    Route::get('/audits/{id}', [AuditsController::class, 'view']);
-    Route::get('/audits/{id}/print', [AuditsController::class, 'print']);
-    Route::put('/audits/{id}', [AuditsController::class, 'update']);
     Route::delete('/audits/{id}', [AuditsController::class, 'delete']);
     
     // rutas de files
