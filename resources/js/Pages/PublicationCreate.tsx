@@ -1,0 +1,255 @@
+import React, { useState } from "react";
+import { router, useForm, usePage } from "@inertiajs/react";
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  AppBar,
+  Toolbar,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Alert,
+  IconButton,
+  Menu,
+  MenuItem as MenuItemComponent,
+} from "@mui/material";
+import {
+  AccountCircle,
+  Add as AddIcon,
+  ArrowBack as ArrowBackIcon,
+  CloudUpload as CloudUploadIcon,
+} from "@mui/icons-material";
+import { ICategory } from "@/types/publication.interface";
+import { useAuth } from "@/hooks/useAuth";
+
+interface PublicationCreateProps {
+  categories: ICategory[];
+  usedCategories: number[];
+  remainingPublications: number;
+}
+
+export default function PublicationCreate({
+  categories,
+  usedCategories,
+  remainingPublications,
+}: PublicationCreateProps) {
+  const user = useAuth();
+  console.log("🚀 ~ PublicationCreate ~ auth:", user);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const { data, setData, post, processing, errors } = useForm({
+    category_id: "",
+    title: "",
+    description: "",
+    image: null as File | null,
+  });
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    router.post("/auth/logout");
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setData("image", file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    post("/publication", {
+      forceFormData: true,
+    });
+  };
+
+  const availableCategories = categories.filter(
+    cat => !usedCategories.includes(cat.id)
+  );
+
+  return (
+    <Box sx={{ flexGrow: 1, minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+      {/* AppBar */}
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={() => router.get("/")}
+            sx={{ mr: 2 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Publicar Clasificado
+          </Typography>
+          {user && (
+            <>
+              <IconButton size="large" onClick={handleMenuOpen} color="inherit">
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItemComponent disabled>
+                  <Typography variant="body2">{user.email}</Typography>
+                </MenuItemComponent>
+                <MenuItemComponent onClick={handleLogout}>
+                  Cerrar Sesión
+                </MenuItemComponent>
+              </Menu>
+            </>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Container sx={{ py: 4 }} maxWidth="md">
+        <Card>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h5" gutterBottom>
+              Crear Nuevo Clasificado
+            </Typography>
+            <Alert severity="info" sx={{ mb: 3 }}>
+              Publicaciones restantes: {remainingPublications} de{" "}
+              {user?.publication_max || 3}
+            </Alert>
+
+            {errors.message && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {errors.message}
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth error={!!errors.category_id}>
+                    <InputLabel>Categoría</InputLabel>
+                    <Select
+                      value={data.category_id}
+                      label="Categoría"
+                      onChange={e => setData("category_id", e.target.value)}
+                      required
+                    >
+                      {availableCategories.map(category => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.icon} {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.category_id && (
+                      <Typography variant="caption" color="error">
+                        {errors.category_id}
+                      </Typography>
+                    )}
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Título"
+                    value={data.title}
+                    onChange={e => setData("title", e.target.value)}
+                    error={!!errors.title}
+                    helperText={errors.title}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Descripción"
+                    multiline
+                    rows={6}
+                    value={data.description}
+                    onChange={e => setData("description", e.target.value)}
+                    error={!!errors.description}
+                    helperText={errors.description}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUploadIcon />}
+                    fullWidth
+                  >
+                    Subir Imagen
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </Button>
+                  {errors.image && (
+                    <Typography variant="caption" color="error">
+                      {errors.image}
+                    </Typography>
+                  )}
+                  {imagePreview && (
+                    <Box sx={{ mt: 2, textAlign: "center" }}>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        style={{ maxWidth: "100%", maxHeight: "300px" }}
+                      />
+                    </Box>
+                  )}
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      disabled={processing}
+                      fullWidth
+                    >
+                      Publicar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => router.get("/")}
+                      disabled={processing}
+                    >
+                      Cancelar
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
+  );
+}

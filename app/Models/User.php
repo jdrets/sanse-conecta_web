@@ -23,6 +23,10 @@ class User extends Authenticatable
         'password',
         'role',
         'client_id',
+        'name',
+        'phone',
+        'address',
+        'publication_max',
     ];
 
     /**
@@ -45,6 +49,39 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'publication_max' => 'integer',
         ];
+    }
+
+    /**
+     * Relación con clasificados publicados por el usuario
+     */
+    public function publications()
+    {
+        return $this->hasMany(Publication::class);
+    }
+
+    /**
+     * Relación con los "me gusta" del usuario
+     */
+    public function publicationLikes()
+    {
+        return $this->hasMany(PublicationLike::class);
+    }
+
+    /**
+     * Verifica si el usuario puede publicar más clasificados
+     */
+    public function canPublishMore()
+    {
+        return $this->publications()->count() < $this->publication_max;
+    }
+
+    /**
+     * Obtiene la cantidad de publicaciones que aún puede publicar
+     */
+    public function remainingPublications()
+    {
+        return max(0, $this->publication_max - $this->publications()->count());
     }
 }
