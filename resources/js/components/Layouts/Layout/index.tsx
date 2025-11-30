@@ -8,8 +8,15 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Divider,
 } from "@mui/material";
-import { Add as AddIcon, AccountCircle } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  AccountCircleOutlined as AccountCircle,
+  LogoutOutlined as LogoutIcon,
+  BookmarksOutlined as BookmarksIcon,
+  SettingsOutlined as SettingsIcon,
+} from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { router } from "@inertiajs/react";
 import logo from "../../../assets/logo.png";
@@ -70,11 +77,41 @@ export const MainLayout = ({
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
                   onClose={handleMenuClose}
+                  sx={{}}
                 >
-                  <MenuItem disabled>
-                    <Typography variant="body2">{user.email}</Typography>
+                  <MenuItem>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <AccountCircle />
+
+                      <Typography variant="body2" sx={{ fontSize: "14px" }}>
+                        {user.email}
+                      </Typography>
+                    </Box>
                   </MenuItem>
-                  <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
+
+                  <Divider />
+
+                  <MenuItemCustom
+                    icon={<BookmarksIcon />}
+                    label="Mis publicaciones"
+                    onClick={() => router.get("/me/publications")}
+                  />
+                  <MenuItemCustom
+                    icon={<SettingsIcon />}
+                    label="Mi cuenta"
+                    onClick={() => router.get("/me/account")}
+                  />
+                  <MenuItemCustom
+                    icon={<LogoutIcon />}
+                    label="Cerrar Sesión"
+                    onClick={handleLogout}
+                  />
                 </Menu>
               </>
             ) : (
@@ -99,5 +136,26 @@ export const MainLayout = ({
 
       <Box component="main">{children}</Box>
     </Box>
+  );
+};
+
+const MenuItemCustom = ({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) => {
+  return (
+    <MenuItem onClick={onClick}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {icon}
+        <Typography variant="body2" sx={{ fontSize: "14px" }}>
+          {label}
+        </Typography>
+      </Box>
+    </MenuItem>
   );
 };

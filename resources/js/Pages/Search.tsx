@@ -3,23 +3,14 @@ import { router } from "@inertiajs/react";
 import {
   Box,
   Button,
-  Container,
   TextField,
   Typography,
   Card,
-  CardContent,
-  CardMedia,
-  CardActions,
-  AppBar,
-  Toolbar,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Chip,
-  IconButton,
-  Menu,
-  MenuItem as MenuItemComponent,
   Stack,
   ButtonBase,
   Divider,
@@ -27,14 +18,11 @@ import {
 import {
   Search as SearchIcon,
   Favorite as FavoriteIcon,
-  AccountCircle,
-  Add as AddIcon,
-  Person,
   PersonOutline,
 } from "@mui/icons-material";
 import { IPublication, ICategory } from "@/types/publication.interface";
-import { useAuth } from "@/hooks/useAuth";
 import { MainLayout } from "../components/Layouts/Layout";
+import ContentLayout from "../components/Layouts/ContentLayout";
 interface SearchProps {
   publications: {
     data: IPublication[];
@@ -111,13 +99,13 @@ export default function Search({
   const childCategories = selectedParent
     ? categories.find(cat => cat.id === selectedParent)?.children || []
     : [];
+  const totalResults = publications.data.length;
 
   return (
     <MainLayout>
-      <Box sx={{ backgroundColor: "primary.main" }}>
-        <Container sx={{ py: 2 }}>
-          {/* Search Filters */}
-          <Card sx={{ mb: 4 }}>
+      <ContentLayout
+        headContent={
+          <Card>
             <Box component="form" onSubmit={handleSearch}>
               <Stack spacing={2}>
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -186,113 +174,101 @@ export default function Search({
               </Stack>
             </Box>
           </Card>
-        </Container>
-      </Box>
-
-      <Box
-        sx={{
-          backgroundColor: "background.default",
-          borderRadius: 1,
-          position: "relative",
-          top: -24,
-        }}
+        }
       >
-        <Container sx={{ py: 2 }}>
-          {/* Results */}
-          <Typography variant="h5" gutterBottom>
-            Resultados ({publications.data.length})
-          </Typography>
-
-          {publications.data.length === 0 ? (
-            <Box sx={{ textAlign: "center", py: 8 }}>
-              <Typography variant="h6" color="text.secondary">
-                No se encontraron clasificados
-              </Typography>
-            </Box>
-          ) : (
-            <Stack spacing={2}>
-              {publications.data.map(publication => (
-                <ButtonBase
-                  onClick={() => router.get(`/publication/${publication.id}`)}
-                  key={publication.id}
+        {publications.data.length === 0 ? (
+          <Box sx={{ textAlign: "center", py: 4 }}>
+            <Typography variant="h6" color="text.secondary">
+              No se encontraron resultados
+            </Typography>
+          </Box>
+        ) : (
+          <Stack spacing={2}>
+            <Typography variant="body1" gutterBottom>
+              {totalResults} resultado encontrado
+              {totalResults > 1 ? "s" : ""}
+            </Typography>
+            {publications.data.map(publication => (
+              <ButtonBase
+                onClick={() => router.get(`/publication/${publication.id}`)}
+                key={publication.id}
+                sx={{
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                <Card
                   sx={{
+                    height: "100%",
                     width: "100%",
-                    textAlign: "left",
                   }}
                 >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      width: "100%",
-                    }}
-                  >
-                    <Stack spacing={1}>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        {publication.category && (
-                          <Chip
-                            label={publication.category.name}
-                            icon={<span>{publication.category.icon}</span>}
-                            size="small"
-                            color="primary"
-                            sx={{ width: "fit-content", fontWeight: 600 }}
-                          />
-                        )}
-
-                        <Box
-                          sx={{
-                            ml: "auto",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <FavoriteIcon fontSize="small" color="error" />
-                          <Typography variant="body2" sx={{ ml: 0.5 }}>
-                            {publication.likes_count}
-                          </Typography>
-                        </Box>
-                      </Stack>
-
-                      <Typography gutterBottom variant="h4" component="h2">
-                        {publication.title}
-                      </Typography>
-
-                      <Divider />
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        {publication.user && (
-                          <Typography variant="body2">
-                            <PersonOutline /> {publication.user.name}
-                          </Typography>
-                        )}
-
-                        <Button
+                  <Stack spacing={1}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      {publication.category && (
+                        <Chip
+                          label={publication.category.name}
+                          icon={<span>{publication.category.icon}</span>}
                           size="small"
-                          sx={{ width: "fit-content", alignSelf: "flex-end" }}
-                          onClick={() =>
-                            router.get(`/publication/${publication.id}`)
-                          }
-                        >
-                          Ver Detalles
-                        </Button>
-                      </Stack>
+                          color="primary"
+                          sx={{ width: "fit-content", fontWeight: 600 }}
+                        />
+                      )}
+
+                      <Box
+                        sx={{
+                          ml: "auto",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <FavoriteIcon fontSize="small" color="error" />
+                        <Typography variant="body2" sx={{ ml: 0.5 }}>
+                          {publication.likes_count}
+                        </Typography>
+                      </Box>
                     </Stack>
-                  </Card>
-                </ButtonBase>
-              ))}
-            </Stack>
-          )}
-        </Container>
-      </Box>
+
+                    <Typography gutterBottom variant="h4" component="h2">
+                      {publication.title}
+                    </Typography>
+
+                    <Divider />
+
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      {publication.user && (
+                        <Typography variant="body2">
+                          <PersonOutline /> {publication.user.name}
+                        </Typography>
+                      )}
+
+                      <Button
+                        size="small"
+                        sx={{ width: "fit-content", alignSelf: "flex-end" }}
+                        onClick={() =>
+                          router.get(`/publication/${publication.id}`)
+                        }
+                      >
+                        Ver Detalles
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Card>
+              </ButtonBase>
+            ))}
+          </Stack>
+        )}
+      </ContentLayout>
     </MainLayout>
   );
 }

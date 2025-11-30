@@ -43,7 +43,123 @@ class FilesController extends Controller
     private const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB en bytes
 
     /**
-     * Subir archivos
+     * Subir imagen de publicación
+     * Método específico para imágenes de publicaciones con validaciones de seguridad
+     */
+    public function uploadPublicationImage(Request $request)
+    {
+        try {
+            // Validar que se haya enviado una imagen
+            $validator = Validator::make($request->all(), [
+                'image' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,gif,webp',
+                    'max:2048', // 2MB
+                ],
+            ], [
+                'image.required' => 'Debe seleccionar una imagen',
+                'image.image' => 'El archivo debe ser una imagen',
+                'image.mimes' => 'Solo se permiten imágenes (JPG, PNG, GIF, WEBP)',
+                'image.max' => 'El tamaño máximo permitido es 2MB',
+            ]);
+
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $image = $request->file('image');
+
+            // Validar que el archivo sea válido
+            if (!$image->isValid()) {
+                throw new \Exception('El archivo no se subió correctamente');
+            }
+
+            // Validar MIME type real
+            $mimeType = $image->getMimeType();
+            $allowedImageMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            
+            if (!in_array($mimeType, $allowedImageMimes)) {
+                throw new \Exception("El archivo no es una imagen válida. Tipo detectado: {$mimeType}");
+            }
+
+            // Validar contenido real del archivo usando finfo (doble verificación)
+            $realPath = $image->getRealPath();
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $detectedMimeType = finfo_file($finfo, $realPath);
+            finfo_close($finfo);
+
+            if (!in_array($detectedMimeType, $allowedImageMimes)) {
+                throw new \Exception("El contenido del archivo no es una imagen válida");
+            }
+
+            // Crear directorio si no existe
+            $publicationsPath = storage_path('app/public/publications');
+            if (!file_exists($publicationsPath)) {
+                mkdir($publicationsPath, 0755, true);
+            }
+
+            // Guardar en storage/app/public/publications
+            $path = $image->store('publications', 'public');
+
+            // Verificar que el archivo se guardó correctamente
+            if (!Storage::disk('public')->exists($path)) {
+                throw new \Exception('No se pudo guardar el archivo en el servidor');
+            }
+
+            return [
+                'success' => true,
+                'path' => $path,
+                'url' => Storage::disk('public')->url($path),
+                'size' => $image->getSize(),
+                'mime_type' => $detectedMimeType,
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Eliminar imagen de publicación
+     */
+    public function deletePublicationImage(string $path)
+    {
+        try {
+            // Validar que el path esté en la carpeta de publicaciones
+            if (!str_starts_with($path, 'publications/')) {
+                throw new \Exception('Ruta de archivo inválida');
+            }
+
+            // Verificar que el archivo existe
+            if (!Storage::disk('public')->exists($path)) {
+                return [
+                    'success' => true,
+                    'message' => 'El archivo ya no existe',
+                ];
+            }
+
+            // Eliminar el archivo
+            Storage::disk('public')->delete($path);
+
+            return [
+                'success' => true,
+                'message' => 'Imagen eliminada correctamente',
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Subir archivos (método original para auditorías)
      */
     public function upload(Request $request)
     {
@@ -310,3 +426,4 @@ class FilesController extends Controller
         }
     }
 }
+

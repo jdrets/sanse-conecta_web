@@ -3,7 +3,6 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 import logo from "@/assets/logo.png";
 
 const TRANSITION_MS = 400;
@@ -59,35 +58,22 @@ const SplashScreen = () => {
       open={isVisible}
       transitionDuration={TRANSITION_MS}
       sx={{
-        zIndex: theme => theme.zIndex.modal + 1,
-        backgroundColor: theme => theme.palette.background.default,
-        color: theme => theme.palette.text.primary,
+        zIndex: 10,
+        backgroundColor: theme => theme.palette.primary.main,
         flexDirection: "column",
-        gap: 3,
-        px: 3,
       }}
     >
-      <Box
-        component="img"
-        src={logo}
-        alt="Logotipo Consultora Industrial"
-        sx={{
-          height: { xs: 96, sm: 112 },
-          width: "auto",
-          filter: "drop-shadow(0px 15px 40px rgba(0, 0, 0, 0.45))",
-        }}
-      />
-      <Stack spacing={1.5} alignItems="center">
-        <Typography
-          variant="overline"
+      <Stack spacing={4} alignItems="center">
+        <Box
+          component="img"
+          src={logo}
+          alt="Logotipo Consultora Industrial"
           sx={{
-            letterSpacing: ".7em",
-            color: theme => theme.palette.text.secondary,
+            height: { xs: 96, sm: 112 },
+            width: "auto",
           }}
-        >
-          Cargando
-        </Typography>
-        <CircularProgress color="primary" size={36} thickness={4} />
+        />
+        <CircularProgress color="secondary" size={36} thickness={4} />
       </Stack>
     </Backdrop>
   );

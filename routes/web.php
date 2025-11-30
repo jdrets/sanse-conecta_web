@@ -37,8 +37,8 @@ Route::middleware(['auth'])->group(function () {
     // Logout (solo usuarios autenticados)
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('logout');
     // Rutas de clasificados (crear, editar, eliminar)
-    // IMPORTANTE: Las rutas específicas deben ir ANTES que las rutas con parámetros dinámicos
     Route::get('/publication/create', [PublicationController::class, 'create'])->name('publication.create');
+    // IMPORTANTE: Las rutas específicas deben ir ANTES que las rutas con parámetros dinámicos
     Route::post('/publication', [PublicationController::class, 'store'])->name('publication.store');
     Route::get('/publication/{id}/edit', [PublicationController::class, 'edit'])->name('publication.edit');
     Route::put('/publication/{id}', [PublicationController::class, 'update'])->name('publication.update');

@@ -113,7 +113,7 @@ export const theme = createTheme({
     borderRadius: 12, // redondeo general de cards, botones y inputs
   },
   typography: {
-    fontFamily: ["Inter", "Roboto", "sans-serif"].join(","),
+    fontFamily: ["Roboto", "sans-serif"].join(","),
     h1: { fontWeight: 700 },
     h2: { fontWeight: 600, fontSize: "32px" },
     h3: { fontWeight: 600, fontSize: "24px" },
@@ -136,7 +136,7 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          padding: 12,
+          padding: 16,
           // Usando shadow[3] del sistema para un efecto suave y moderno
           boxShadow: shadows[8],
           transition: "box-shadow 0.3s ease-in-out",
@@ -156,6 +156,23 @@ export const theme = createTheme({
         },
         contained: {
           boxShadow: shadows[4],
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          fontSize: "14px",
+          padding: "8px 12px",
+          minHeight: "auto",
         },
       },
     },

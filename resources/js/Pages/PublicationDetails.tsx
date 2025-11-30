@@ -1,39 +1,37 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import {
   Box,
   Button,
-  Container,
   Typography,
   Card,
   CardContent,
   CardMedia,
-  AppBar,
-  Toolbar,
   Chip,
   IconButton,
-  Menu,
-  MenuItem as MenuItemComponent,
-  Stack,
   Divider,
-  Paper,
+  Stack,
 } from "@mui/material";
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
-  AccountCircle,
-  Add as AddIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
+  PersonOutlined as PersonOutlinedIcon,
   LocationOn as LocationIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
+  EditOutlined as EditIcon,
+  DeleteOutlined as DeleteIcon,
+  ShareOutlined as ShareIcon,
 } from "@mui/icons-material";
 import { IPublication } from "@/types/publication.interface";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { MainLayout } from "../components/Layouts/Layout";
+import ContentLayout from "../components/Layouts/ContentLayout";
+import Modal from "../components/Modal";
+import { useDisclosure } from "@chakra-ui/hooks";
 
 interface PublicationDetailsProps {
   publication: IPublication;
@@ -52,9 +50,9 @@ export default function PublicationDetails({
   isLiked,
 }: PublicationDetailsProps) {
   const user = useAuth();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [liked, setLiked] = useState(isLiked);
   const [likesCount, setLikesCount] = useState(publication.likes_count);
+  const unauthenticatedDisclosure = useDisclosure();
 
   const likeMutation = useMutation({
     mutationFn: async (publicationId: number) => {
@@ -75,21 +73,9 @@ export default function PublicationDetails({
     },
   });
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    router.post("/auth/logout");
-  };
-
   const handleLike = () => {
     if (!user) {
-      router.get("/auth/login");
+      unauthenticatedDisclosure.onOpen();
       return;
     }
 
@@ -107,113 +93,73 @@ export default function PublicationDetails({
   };
 
   const isOwner = user && publication.user_id === user.id;
+  console.log("🚀 ~ PublicationDetails ~ user:", user);
+
+  const handleShare = () => {
+    navigator.share({
+      title: publication.title,
+      text: publication.description,
+      url: `${window.location.origin}/publication/${publication.id}`,
+    });
+  };
 
   return (
-    <Box
-      sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}
-    >
-      {/* AppBar */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, cursor: "pointer" }}
-            onClick={() => router.get("/")}
-          >
-            Sanse Conecta
-          </Typography>
-          {user ? (
-            <>
-              <Button
-                color="inherit"
-                onClick={() => router.get("/publication/create")}
-              >
-                <AddIcon sx={{ mr: 1 }} />
-                Publicar Clasificado
-              </Button>
-              <IconButton size="large" onClick={handleMenuOpen} color="inherit">
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItemComponent disabled>
-                  <Typography variant="body2">{user.email}</Typography>
-                </MenuItemComponent>
-                <MenuItemComponent onClick={handleLogout}>
-                  Cerrar Sesión
-                </MenuItemComponent>
-              </Menu>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" onClick={() => router.get("/auth/login")}>
-                Iniciar Sesión
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.get("/auth/register")}
-              >
-                Registrarse
-              </Button>
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
+    <MainLayout>
+      <ContentLayout
+        headContent={
+          <Card sx={{ p: 0 }}>
+            {publication.image && (
+              <CardMedia
+                component="img"
+                height="400"
+                image={`/storage/${publication.image}`}
+                alt={publication.title}
+              />
+            )}
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+                  {publication.title}
+                </Typography>
+                {isOwner && (
+                  <Box>
+                    <IconButton onClick={handleEdit} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={handleDelete} color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                )}
+                {/* Share button */}
+                <IconButton onClick={handleShare} color="primary">
+                  <ShareIcon />
+                </IconButton>
+              </Box>
 
-      <Container sx={{ py: 4 }}>
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={3}
-          alignItems="flex-start"
-        >
-          {/* Publication Image and Details */}
-          <Box sx={{ flex: { xs: 1, md: 2 }, width: "100%" }}>
-            <Card>
-              {publication.image && (
-                <CardMedia
-                  component="img"
-                  height="400"
-                  image={`/storage/${publication.image}`}
-                  alt={publication.title}
+              {publication.category && (
+                <Chip
+                  label={publication.category.name}
+                  icon={<span>{publication.category.icon}</span>}
+                  sx={{ mb: 2 }}
                 />
               )}
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-                    {publication.title}
-                  </Typography>
-                  {isOwner && (
-                    <Box>
-                      <IconButton onClick={handleEdit} color="primary">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton onClick={handleDelete} color="error">
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  )}
-                </Box>
 
-                {publication.category && (
-                  <Chip
-                    label={publication.category.name}
-                    icon={<span>{publication.category.icon}</span>}
-                    sx={{ mb: 2 }}
-                  />
-                )}
+              <Typography variant="body1" paragraph>
+                {publication.description}
+              </Typography>
 
-                <Typography variant="body1" paragraph>
-                  {publication.description}
-                </Typography>
+              <Divider sx={{ my: 2 }} />
 
-                <Divider sx={{ my: 2 }} />
-
+              <Stack direction="row" justifyContent="space-between">
                 {/* Like Button */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <FavoriteIcon fontSize="small" color="error" /> {likesCount}{" "}
+                    {likesCount === 1 ? "persona" : "personas"} le gusta esto
+                  </Typography>
+                </Box>
+                {!isOwner && (
                   <Button
                     variant={liked ? "contained" : "outlined"}
                     color="error"
@@ -229,70 +175,105 @@ export default function PublicationDetails({
                         ? "Te gusta"
                         : "Me gusta"}
                   </Button>
-                  <Typography variant="body2" color="text.secondary">
-                    {likesCount} {likesCount === 1 ? "persona" : "personas"} le
-                    gusta esto
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+        }
+      >
+        <Card>
+          <Typography variant="h6" gutterBottom>
+            Información de Contacto
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+
+          {publication.user && (
+            <>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>{publication.user.name}</strong>
+              </Typography>
+
+              {publication.user.email && (
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <EmailIcon sx={{ mr: 1, color: "text.secondary" }} />
+                  <Typography variant="body2">
+                    {publication.user.email}
                   </Typography>
                 </Box>
-              </CardContent>
-            </Card>
-          </Box>
-
-          {/* Contact Information */}
-          <Box sx={{ flex: { xs: 1, md: 1 }, width: "100%" }}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Información de Contacto
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-
-              {publication.user && (
-                <>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>{publication.user.name}</strong>
-                  </Typography>
-
-                  {publication.user.email && (
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <EmailIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">
-                        {publication.user.email}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {publication.user.phone && (
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">
-                        {publication.user.phone}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {publication.user.address && (
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <LocationIcon sx={{ mr: 1, color: "text.secondary" }} />
-                      <Typography variant="body2">
-                        {publication.user.address}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    href={`mailto:${publication.user.email}`}
-                    startIcon={<EmailIcon />}
-                  >
-                    Contactar
-                  </Button>
-                </>
               )}
-            </Paper>
+
+              {publication.user.phone && (
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
+                  <Typography variant="body2">
+                    {publication.user.phone}
+                  </Typography>
+                </Box>
+              )}
+
+              {publication.user.address && (
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <LocationIcon sx={{ mr: 1, color: "text.secondary" }} />
+                  <Typography variant="body2">
+                    {publication.user.address}
+                  </Typography>
+                </Box>
+              )}
+
+              <Button
+                variant="contained"
+                fullWidth
+                href={`mailto:${publication.user.email}`}
+                startIcon={<EmailIcon />}
+              >
+                Contactar
+              </Button>
+            </>
+          )}
+        </Card>
+      </ContentLayout>
+
+      <Modal
+        open={unauthenticatedDisclosure.isOpen}
+        onClose={unauthenticatedDisclosure.onClose}
+      >
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              backgroundColor: "primary.main",
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              color: "white",
+              alignSelf: "center",
+            }}
+          >
+            <PersonOutlinedIcon sx={{ fontSize: 40 }} />
           </Box>
+
+          <Stack spacing={0.5} textAlign="center">
+            <Typography variant="body1" fontWeight={600}>
+              Iniciar sesión o registrarse
+            </Typography>
+            <Typography variant="body2">
+              Para poder recomendar este clasificado, debes registrarte o
+              iniciar sesión.
+            </Typography>
+          </Stack>
+
+          <Stack spacing={1}>
+            <Button variant="contained" fullWidth href="/auth/register">
+              Iniciar sesión
+            </Button>
+            <Button variant="text" fullWidth href="/auth/login">
+              Registrarse
+            </Button>
+          </Stack>
         </Stack>
-      </Container>
-    </Box>
+      </Modal>
+    </MainLayout>
   );
 }

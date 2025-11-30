@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Http\Controllers\FilesController;
 
 class PublicationController extends Controller
 {
@@ -116,11 +117,6 @@ class PublicationController extends Controller
     public function create()
     {
         $user = auth()->user();
-        
-        if (!$user->canPublishMore()) {
-            return redirect()->route('home')
-                ->with('error', 'Has alcanzado el límite de publicaciones permitidas.');
-        }
 
         // Cargar todas las categorías (padre e hijos) para el selector en cascada
         $categories = Category::where('is_active', true)
@@ -135,6 +131,7 @@ class PublicationController extends Controller
             'categories' => $categories,
             'usedCategories' => $usedCategories,
             'remainingPublications' => $user->remainingPublications(),
+            'canPublishMore' => $user->canPublishMore(),
         ]);
     }
 
@@ -168,10 +165,16 @@ class PublicationController extends Controller
         $data = $request->only(['category_id', 'title', 'description']);
         $data['user_id'] = $user->id;
 
-        // Manejar la imagen
+        // Manejar la imagen usando FilesController
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('publications', 'public');
-            $data['image'] = $path;
+            $filesController = new FilesController();
+            $result = $filesController->uploadPublicationImage($request);
+            
+            if ($result['success']) {
+                $data['image'] = $result['path'];
+            } else {
+                return back()->withErrors(['image' => $result['error']])->withInput();
+            }
         }
 
         $publication = Publication::create($data);
@@ -245,15 +248,23 @@ class PublicationController extends Controller
 
         $data = $request->only(['category_id', 'title', 'description']);
 
-        // Manejar la imagen
+        // Manejar la imagen usando FilesController
         if ($request->hasFile('image')) {
+            $filesController = new FilesController();
+            
             // Eliminar imagen anterior si existe
             if ($publication->image) {
-                Storage::disk('public')->delete($publication->image);
+                $filesController->deletePublicationImage($publication->image);
             }
             
-            $path = $request->file('image')->store('publications', 'public');
-            $data['image'] = $path;
+            // Subir nueva imagen
+            $result = $filesController->uploadPublicationImage($request);
+            
+            if ($result['success']) {
+                $data['image'] = $result['path'];
+            } else {
+                return back()->withErrors(['image' => $result['error']])->withInput();
+            }
         }
 
         $publication->update($data);
@@ -274,9 +285,10 @@ class PublicationController extends Controller
             abort(403, 'No tienes permiso para eliminar este clasificado.');
         }
 
-        // Eliminar imagen si existe
+        // Eliminar imagen si existe usando FilesController
         if ($publication->image) {
-            Storage::disk('public')->delete($publication->image);
+            $filesController = new FilesController();
+            $filesController->deletePublicationImage($publication->image);
         }
 
         $publication->delete();
