@@ -84,15 +84,42 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: ["Inter", "Roboto", "sans-serif"].join(","),
-    h1: { fontWeight: 700, fontSize: "2rem", color: GREY[800] },
-    h2: { fontWeight: 600, fontSize: "1.75rem", color: GREY[800] },
-    h3: { fontWeight: 600, fontSize: "1.5rem", color: GREY[800] },
-    h4: { fontWeight: 600, fontSize: "1.25rem", color: GREY[800] },
-    h5: { fontWeight: 500, fontSize: "1rem", color: GREY[700] },
-    h6: { fontWeight: 500, fontSize: "0.875rem", color: GREY[700] },
-    body1: { fontSize: "0.9375rem", color: GREY[700] },
-    body2: { fontSize: "0.8125rem", color: GREY[600] },
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 600 },
+    h3: { fontWeight: 600 },
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 500 },
+    h6: { fontWeight: 500 },
+    body1: { fontSize: "0.9375rem" },
+    body2: { fontSize: "0.8125rem" },
     button: { textTransform: "none", fontWeight: 600 },
   },
-  components: {},
+  components: {
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          backgroundColor: "white",
+          color: "black",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          padding: 12,
+          boxShadow:
+            "0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: 600,
+          padding: "12px 6px",
+        },
+      },
+    },
+  },
 });
