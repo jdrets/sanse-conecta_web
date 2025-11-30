@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -22,23 +21,37 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
         ]);
 
-        $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            return redirect()->intended('/');
+            $user = Auth::user();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Inicio de sesión exitoso.',
+                'redirect' => '/',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ]
+            ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
-        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            'errors' => [
+                'email' => ['Las credenciales proporcionadas no coinciden con nuestros registros.']
+            ]
+        ], 422);
     }
 
     /**
@@ -54,7 +67,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
@@ -63,18 +76,27 @@ class AuthController extends Controller
         ]);
 
         $user = \App\Models\User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'phone' => $request->phone,
-            'address' => $request->address,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
             'role' => 'user',
             'publication_max' => 3, // Valor por defecto
         ]);
 
         Auth::login($user);
 
-        return redirect('/');
+        return response()->json([
+            'success' => true,
+            'message' => 'Registro exitoso.',
+            'redirect' => '/',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
     }
 
     /**

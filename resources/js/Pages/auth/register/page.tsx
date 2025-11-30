@@ -1,5 +1,8 @@
-import React from "react";
-import { useForm } from "@inertiajs/react";
+import React, { useState } from "react";
+import { router, Link } from "@inertiajs/react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Box,
   Button,
@@ -9,13 +12,31 @@ import {
   TextField,
   Typography,
   Link as MuiLink,
-  Alert,
   Grid,
 } from "@mui/material";
-import { Link } from "@inertiajs/react";
+
+interface RegisterResponse {
+  success: boolean;
+  message: string;
+  redirect?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  phone?: string;
+  address?: string;
+}
 
 export default function RegisterPage() {
-  const { data, setData, post, processing, errors } = useForm({
+  const [formData, setFormData] = useState<RegisterData>({
     name: "",
     email: "",
     password: "",
@@ -23,10 +44,57 @@ export default function RegisterPage() {
     phone: "",
     address: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterData) => {
+      const response = await axios.post<RegisterResponse>(
+        "/auth/register",
+        data
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+        setTimeout(() => {
+          router.visit(data.redirect || "/");
+        }, 500);
+      }
+    },
+    onError: (error: any) => {
+      if (error.response?.status === 422) {
+        const errorData = error.response.data;
+        if (errorData.errors) {
+          const formattedErrors: Record<string, string> = {};
+          Object.keys(errorData.errors).forEach((key) => {
+            formattedErrors[key] = errorData.errors[key][0];
+          });
+          setErrors(formattedErrors);
+        }
+        toast.error(errorData.message || "Error al registrar usuario");
+      } else {
+        toast.error("Error al registrar. Por favor intenta de nuevo.");
+      }
+    },
+  });
+
+  const handleChange = (field: keyof RegisterData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post("/auth/register");
+    setErrors({});
+    registerMutation.mutate(formData);
   };
 
   return (
@@ -36,7 +104,7 @@ export default function RegisterPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
         py: 4,
       }}
     >
@@ -55,20 +123,14 @@ export default function RegisterPage() {
               Crea tu cuenta en Sanse Conecta
             </Typography>
 
-            {errors.email && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {errors.email}
-              </Alert>
-            )}
-
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label="Nombre completo"
-                    value={data.name}
-                    onChange={(e) => setData("name", e.target.value)}
+                    value={formData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
                     error={!!errors.name}
                     helperText={errors.name}
                     required
@@ -79,8 +141,8 @@ export default function RegisterPage() {
                     fullWidth
                     label="Email"
                     type="email"
-                    value={data.email}
-                    onChange={(e) => setData("email", e.target.value)}
+                    value={formData.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
                     error={!!errors.email}
                     helperText={errors.email}
                     required
@@ -91,8 +153,8 @@ export default function RegisterPage() {
                     fullWidth
                     label="Contraseña"
                     type="password"
-                    value={data.password}
-                    onChange={(e) => setData("password", e.target.value)}
+                    value={formData.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
                     error={!!errors.password}
                     helperText={errors.password}
                     required
@@ -103,10 +165,12 @@ export default function RegisterPage() {
                     fullWidth
                     label="Confirmar contraseña"
                     type="password"
-                    value={data.password_confirmation}
+                    value={formData.password_confirmation}
                     onChange={(e) =>
-                      setData("password_confirmation", e.target.value)
+                      handleChange("password_confirmation", e.target.value)
                     }
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation}
                     required
                   />
                 </Grid>
@@ -114,8 +178,8 @@ export default function RegisterPage() {
                   <TextField
                     fullWidth
                     label="Teléfono"
-                    value={data.phone}
-                    onChange={(e) => setData("phone", e.target.value)}
+                    value={formData.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
                     error={!!errors.phone}
                     helperText={errors.phone}
                   />
@@ -124,8 +188,8 @@ export default function RegisterPage() {
                   <TextField
                     fullWidth
                     label="Dirección"
-                    value={data.address}
-                    onChange={(e) => setData("address", e.target.value)}
+                    value={formData.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
                     error={!!errors.address}
                     helperText={errors.address}
                   />
@@ -137,10 +201,10 @@ export default function RegisterPage() {
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={processing}
+                disabled={registerMutation.isPending}
                 sx={{ mt: 3, mb: 2 }}
               >
-                Registrarse
+                {registerMutation.isPending ? "Registrando..." : "Registrarse"}
               </Button>
 
               <Box sx={{ textAlign: "center" }}>

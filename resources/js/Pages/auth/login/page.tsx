@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { useForm } from "@inertiajs/react";
+import { router, Link } from "@inertiajs/react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Box,
   Button,
@@ -11,18 +14,60 @@ import {
   Link as MuiLink,
   Alert,
 } from "@mui/material";
-import { Link } from "@inertiajs/react";
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  redirect?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  errors?: {
+    email?: string[];
+  };
+}
 
 export default function LoginPage() {
-  const { data, setData, post, processing, errors } = useForm({
-    email: "",
-    password: "",
-    remember: false,
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string }>({});
+
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const response = await axios.post<LoginResponse>(
+        "/auth/login",
+        credentials
+      );
+      return response.data;
+    },
+    onSuccess: data => {
+      if (data.success) {
+        toast.success(data.message);
+        // Redirect después de un breve delay para que se vea el toast
+        setTimeout(() => {
+          router.visit(data.redirect || "/");
+        }, 500);
+      }
+    },
+    onError: (error: any) => {
+      if (error.response?.status === 422) {
+        const errorData = error.response.data;
+        setErrors({
+          email: errorData.errors?.email?.[0] || errorData.message,
+        });
+        toast.error(errorData.message || "Error al iniciar sesión");
+      } else {
+        toast.error("Error al iniciar sesión. Por favor intenta de nuevo.");
+      }
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post("/auth/login");
+    setErrors({});
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -32,7 +77,7 @@ export default function LoginPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
       }}
     >
       <Container maxWidth="sm">
@@ -61,9 +106,10 @@ export default function LoginPage() {
                 fullWidth
                 label="Email"
                 type="email"
-                value={data.email}
-                onChange={(e) => setData("email", e.target.value)}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 error={!!errors.email}
+                helperText={errors.email}
                 margin="normal"
                 required
               />
@@ -71,9 +117,8 @@ export default function LoginPage() {
                 fullWidth
                 label="Contraseña"
                 type="password"
-                value={data.password}
-                onChange={(e) => setData("password", e.target.value)}
-                error={!!errors.password}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 margin="normal"
                 required
               />
@@ -83,10 +128,12 @@ export default function LoginPage() {
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={processing}
+                disabled={loginMutation.isPending}
                 sx={{ mt: 3, mb: 2 }}
               >
-                Iniciar Sesión
+                {loginMutation.isPending
+                  ? "Iniciando sesión..."
+                  : "Iniciar Sesión"}
               </Button>
 
               <Box sx={{ textAlign: "center" }}>
@@ -106,4 +153,3 @@ export default function LoginPage() {
     </Box>
   );
 }
-

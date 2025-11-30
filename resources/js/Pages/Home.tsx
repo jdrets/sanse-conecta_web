@@ -31,6 +31,7 @@ interface HomeProps {
 
 export default function Home({ categories }: HomeProps) {
   const user = useAuth();
+  console.log("🚀 ~ Home ~ user:", user);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -57,7 +58,9 @@ export default function Home({ categories }: HomeProps) {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box
+      sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}
+    >
       {/* AppBar */}
       <AppBar position="static">
         <Toolbar>

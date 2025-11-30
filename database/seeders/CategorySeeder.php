@@ -16,90 +16,158 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Plomería',
-                'description' => 'Servicios de instalación y reparación de plomería',
-                'icon' => '🔧',
+                'name' => 'Hogar y mantenimiento',
+                'icon' => '🛠️',
+                'order' => 1,
+                'children' => [
+                    'Plomería / Gasista',
+                    'Electricista',
+                    'Albañilería',
+                    'Pintura de interiores/exteriores',
+                    'Jardinería y paisajismo',
+                    'Riego automático (instalación/reparación)',
+                    'Carpintería a medida',
+                    'Colocador de durlock/steel-frame',
+                    'Cerrajería',
+                    'Técnico de aires acondicionados',
+                    'Técnico de electrodomésticos',
+                    'Instalador de cámaras de seguridad',
+                    'Colocador de pisos y revestimientos',
+                    'Impermeabilización / techista',
+                    'Limpieza de canaletas y techos',
+                ],
             ],
             [
-                'name' => 'Electricidad',
-                'description' => 'Servicios de instalación eléctrica y reparaciones',
-                'icon' => '💡',
+                'name' => 'Automotor y movilidad',
+                'icon' => '🚗',
+                'order' => 2,
+                'children' => [
+                    'Mecánica automotor',
+                    'Gomería / reparación de neumáticos',
+                    'Lavado y detailing de autos',
+                    'Chapa y pintura',
+                    'Servicio de grúa / auxilio',
+                    'Instalación de alarmas y audio',
+                    'Servicio pre-VTV / diagnóstico',
+                    'Polarizado y colocación de film',
+                    'Cerrajería automotriz',
+                ],
             ],
             [
-                'name' => 'Limpieza',
-                'description' => 'Servicios de limpieza de casas y oficinas',
-                'icon' => '🧹',
+                'name' => 'Limpieza y organización',
+                'icon' => '🧼',
+                'order' => 3,
+                'children' => [
+                    'Limpieza de casas',
+                    'Limpieza de piletas',
+                    'Limpieza de tapizados y sillones',
+                    'Lavadero / planchado de ropa',
+                    'Organización de espacios / orden del hogar',
+                    'Mudanzas y fletes',
+                    'Limpieza de vidrios en altura',
+                    'Control y desinfección de plagas',
+                ],
             ],
             [
-                'name' => 'Jardinería',
-                'description' => 'Mantenimiento y diseño de jardines',
-                'icon' => '🌱',
-            ],
-            [
-                'name' => 'Carpintería',
-                'description' => 'Trabajos en madera, muebles y reparaciones',
-                'icon' => '🪚',
-            ],
-            [
-                'name' => 'Pintura',
-                'description' => 'Servicios de pintura interior y exterior',
-                'icon' => '🎨',
-            ],
-            [
-                'name' => 'Mecánica',
-                'description' => 'Reparación y mantenimiento de vehículos',
-                'icon' => '🔩',
-            ],
-            [
-                'name' => 'Albañilería',
-                'description' => 'Construcción y reparaciones de obra',
-                'icon' => '🧱',
-            ],
-            [
-                'name' => 'Cerrajería',
-                'description' => 'Apertura y reparación de cerraduras',
-                'icon' => '🔑',
-            ],
-            [
-                'name' => 'Tecnología',
-                'description' => 'Soporte técnico y reparación de computadoras',
-                'icon' => '💻',
-            ],
-            [
-                'name' => 'Cuidado de Mascotas',
-                'description' => 'Paseo y cuidado de mascotas',
-                'icon' => '🐕',
-            ],
-            [
-                'name' => 'Clases Particulares',
-                'description' => 'Clases y tutorías de diferentes materias',
-                'icon' => '📚',
-            ],
-            [
-                'name' => 'Mudanzas',
-                'description' => 'Servicios de mudanza y transporte',
-                'icon' => '📦',
-            ],
-            [
-                'name' => 'Cuidado de Niños',
-                'description' => 'Servicios de niñera y cuidado infantil',
+                'name' => 'Cuidado y bienestar familiar',
                 'icon' => '👶',
+                'order' => 4,
+                'children' => [
+                    'Niñera / cuidado de niños',
+                    'Cuidado de adultos mayores',
+                    'Paseo y cuidado de mascotas',
+                    'Adiestramiento canino',
+                    'Guardería de mascotas',
+                    'Clases de apoyo escolar',
+                    'Tutorías particulares (matemática, idiomas, etc)',
+                ],
             ],
             [
-                'name' => 'Cocina',
-                'description' => 'Servicios de chef a domicilio y catering',
-                'icon' => '👨‍🍳',
+                'name' => 'Salud, deporte y estética',
+                'icon' => '💪',
+                'order' => 5,
+                'children' => [
+                    'Entrenador personal / functional training',
+                    'Yoga / Pilates / Meditación',
+                    'Masajista profesional',
+                    'Kinesiología a domicilio',
+                    'Peluquería a domicilio',
+                    'Manicure / Pedicure',
+                    'Maquillaje profesional',
+                    'Barbero a domicilio',
+                    'Cosmetología / Esteticista',
+                ],
+            ],
+            [
+                'name' => 'Tecnología y digital',
+                'icon' => '💻',
+                'order' => 6,
+                'children' => [
+                    'Soporte técnico de PC/notebooks',
+                    'Armado y reparación de redes Wi-Fi',
+                    'Desarrollo web / programación',
+                    'Diseño gráfico / UX-UI',
+                    'Marketing digital y redes sociales',
+                    'Fotografía profesional',
+                    'Edición de video',
+                    'Desarrollo de tiendas online',
+                    'Clases de tecnología / herramientas digitales',
+                ],
+            ],
+            [
+                'name' => 'Eventos y servicios profesionales',
+                'icon' => '🎉',
+                'order' => 7,
+                'children' => [
+                    'DJ / Sonido para eventos',
+                    'Catering / Chef particular',
+                    'Pastelería para eventos',
+                    'Decoración / ambientación',
+                    'Bartender para eventos',
+                    'Fotografía y video para eventos',
+                    'Organización integral de eventos',
+                    'Clases y talleres (cocina, arte, música, etc)',
+                    'Servicios legales (asesoramientos puntuales)',
+                    'Contador / asesor impositivo',
+                    'Arquitectura / planos / dirección de obra',
+                ],
+            ],
+            [
+                'name' => 'Construcción y exteriores',
+                'icon' => '🏗️',
+                'order' => 8,
+                'children' => [
+                    'Parquización y diseño de jardines',
+                    'Mantenimiento de espacios comunes',
+                    'Piletas (mantenimiento o reparación)',
+                    'Perforación de pozos',
+                    'Construcción de decks y pérgolas',
+                ],
             ],
         ];
 
-        foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'slug' => Str::slug($category['name']),
-                'description' => $category['description'],
-                'icon' => $category['icon'],
+        foreach ($categories as $index => $parentData) {
+            // Crear categoría padre
+            $parent = Category::create([
+                'name' => $parentData['name'],
+                'slug' => Str::slug($parentData['name']),
+                'icon' => $parentData['icon'],
                 'is_active' => true,
+                'parent_id' => null,
+                'order' => $parentData['order'],
             ]);
+
+            // Crear subcategorías
+            foreach ($parentData['children'] as $childIndex => $childName) {
+                Category::create([
+                    'name' => $childName,
+                    'slug' => Str::slug($childName),
+                    'icon' => null,
+                    'is_active' => true,
+                    'parent_id' => $parent->id,
+                    'order' => $childIndex + 1,
+                ]);
+            }
         }
     }
 }

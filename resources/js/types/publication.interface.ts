@@ -5,8 +5,12 @@ export interface ICategory {
   description: string | null;
   icon: string | null;
   is_active: boolean;
+  parent_id: number | null;
+  order: number;
   created_at: string;
   updated_at: string;
+  children?: ICategory[];
+  parent?: ICategory;
 }
 
 export interface IPublication {

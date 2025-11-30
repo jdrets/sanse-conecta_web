@@ -51,23 +51,58 @@ export default function Search({
   const user = useAuth();
   const [searchQuery, setSearchQuery] = useState(filters.search || "");
   const [categoryId, setCategoryId] = useState(filters.category_id || "");
+  const [selectedParent, setSelectedParent] = useState<number | "">("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Encontrar la categoría padre si hay un filtro de categoría
+  React.useEffect(() => {
+    if (filters.category_id && categories.length > 0) {
+      const allCategories = categories.flatMap(parent => [
+        parent,
+        ...(parent.children || []),
+      ]);
+      const currentCategory = allCategories.find(
+        cat => cat.id === filters.category_id
+      );
+      if (currentCategory?.parent_id) {
+        setSelectedParent(currentCategory.parent_id);
+      }
+    }
+  }, [filters.category_id, categories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.get("/search", {
-      search: searchQuery,
-      category_id: categoryId || undefined,
-    });
+    handleApplyFilters();
+  };
+
+  const handleParentChange = (parentId: number | "") => {
+    setSelectedParent(parentId);
+    setCategoryId(""); // Resetear subcategoría
+    // No hacer búsqueda aquí, solo cambiar el estado
   };
 
   const handleCategoryChange = (value: any) => {
     setCategoryId(value);
+  };
+
+  const handleApplyFilters = () => {
     router.get("/search", {
-      search: searchQuery,
-      category_id: value || undefined,
+      search: searchQuery || undefined,
+      category_id: categoryId ? Number(categoryId) : undefined,
     });
   };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedParent("");
+    setCategoryId("");
+    router.get("/search");
+  };
+
+  // Filtrar subcategorías basadas en la categoría padre seleccionada
+  const childCategories = selectedParent
+    ? categories.find(cat => cat.id === selectedParent)?.children || []
+    : [];
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -142,35 +177,66 @@ export default function Search({
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Box component="form" onSubmit={handleSearch}>
-              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-                <TextField
-                  fullWidth
-                  placeholder="Buscar clasificados..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton type="submit" color="primary">
-                        <SearchIcon />
-                      </IconButton>
-                    ),
-                  }}
-                />
-                <FormControl fullWidth>
-                  <InputLabel>Categoría</InputLabel>
-                  <Select
-                    value={categoryId}
-                    label="Categoría"
-                    onChange={e => handleCategoryChange(e.target.value)}
+              <Stack spacing={2}>
+                <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                  <TextField
+                    fullWidth
+                    placeholder="Buscar clasificados..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                  />
+                  <FormControl sx={{ minWidth: { xs: "100%", md: 200 } }}>
+                    <InputLabel>Categoría Principal</InputLabel>
+                    <Select
+                      value={selectedParent}
+                      label="Categoría Principal"
+                      onChange={e =>
+                        handleParentChange(e.target.value as number)
+                      }
+                    >
+                      <MenuItem value="">Todas las categorías</MenuItem>
+                      {categories.map(category => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.icon} {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl
+                    sx={{ minWidth: { xs: "100%", md: 200 } }}
+                    disabled={!selectedParent}
                   >
-                    <MenuItem value="">Todas las categorías</MenuItem>
-                    {categories.map(category => (
-                      <MenuItem key={category.id} value={category.id}>
-                        {category.icon} {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                    <InputLabel>Subcategoría</InputLabel>
+                    <Select
+                      value={categoryId}
+                      label="Subcategoría"
+                      onChange={e => handleCategoryChange(e.target.value)}
+                    >
+                      <MenuItem value="">Todas</MenuItem>
+                      {childCategories.map(category => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button
+                    variant="outlined"
+                    onClick={handleClearFilters}
+                    disabled={!searchQuery && !categoryId}
+                  >
+                    Limpiar filtros
+                  </Button>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    startIcon={<SearchIcon />}
+                  >
+                    Buscar
+                  </Button>
+                </Stack>
               </Stack>
             </Box>
           </CardContent>

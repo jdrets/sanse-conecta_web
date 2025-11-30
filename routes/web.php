@@ -24,6 +24,8 @@ Route::get('/search', [PublicationController::class, 'search'])->name('publicati
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware(['auth'])->group(function () {
+    // Logout (solo usuarios autenticados)
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->name('logout');
     // Rutas de clasificados (crear, editar, eliminar)
     // IMPORTANTE: Las rutas específicas deben ir ANTES que las rutas con parámetros dinámicos
     Route::get('/publication/create', [PublicationController::class, 'create'])->name('publication.create');
@@ -41,8 +43,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/files', [FilesController::class, 'upload']);
     Route::get('/files/{path}', [FilesController::class, 'download'])->name('files.download');
 
-    // Logout
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
 });
 
 // Ver detalle de clasificado (pública) - debe ir después de las rutas específicas

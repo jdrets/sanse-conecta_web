@@ -16,7 +16,12 @@ class PublicationController extends Controller
     public function home()
     {
         $user = auth()->user(); 
-        $categories = Category::where('is_active', true)->get();
+        // Solo cargar categorías padre con sus hijos
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with('children')
+            ->orderBy('order')
+            ->get();
         
         return Inertia::render('Home', [
             'categories' => $categories,
@@ -51,7 +56,12 @@ class PublicationController extends Controller
         // Ordenar por popularidad (más likes)
         $publications = $query->popular()->paginate(12);
 
-        $categories = Category::where('is_active', true)->get();
+        // Solo categorías padre para el filtro, con sus hijos
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with('children')
+            ->orderBy('order')
+            ->get();
 
         return Inertia::render('Search', [
             'user' => $user,
@@ -94,9 +104,12 @@ class PublicationController extends Controller
                 ->with('error', 'Has alcanzado el límite de publicaciones permitidas.');
         }
 
-        $categories = Category::where('is_active', true)->get();
+        // Cargar todas las categorías (padre e hijos) para el selector en cascada
+        $categories = Category::where('is_active', true)
+            ->orderByRaw('COALESCE(parent_id, 0), `order`')
+            ->get();
         
-        // Obtener categorías ya usadas por el usuario
+        // Obtener categorías ya usadas por el usuario (solo subcategorías)
         $usedCategories = $user->publications()->pluck('category_id')->toArray();
 
         return Inertia::render('PublicationCreate', [
@@ -162,9 +175,12 @@ class PublicationController extends Controller
             abort(403, 'No tienes permiso para editar este clasificado.');
         }
 
-        $categories = Category::where('is_active', true)->get();
+        // Cargar todas las categorías (padre e hijos) para el selector en cascada
+        $categories = Category::where('is_active', true)
+            ->orderByRaw('COALESCE(parent_id, 0), `order`')
+            ->get();
         
-        // Obtener categorías ya usadas por el usuario (excluyendo la actual)
+        // Obtener categorías ya usadas por el usuario (excluyendo la actual, solo subcategorías)
         $usedCategories = $user->publications()
             ->where('id', '!=', $publication->id)
             ->pluck('category_id')

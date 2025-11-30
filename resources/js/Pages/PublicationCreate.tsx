@@ -44,6 +44,7 @@ export default function PublicationCreate({
   console.log("🚀 ~ PublicationCreate ~ auth:", user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedParent, setSelectedParent] = useState<number | "">("");
 
   const { data, setData, post, processing, errors } = useForm({
     category_id: "",
@@ -83,9 +84,20 @@ export default function PublicationCreate({
     });
   };
 
-  const availableCategories = categories.filter(
-    cat => !usedCategories.includes(cat.id)
-  );
+  // Filtrar categorías padre (sin parent_id)
+  const parentCategories = categories.filter(cat => !cat.parent_id);
+
+  // Filtrar subcategorías basadas en la categoría padre seleccionada
+  const childCategories = selectedParent
+    ? categories.filter(
+        cat => cat.parent_id === selectedParent && !usedCategories.includes(cat.id)
+      )
+    : [];
+
+  const handleParentChange = (parentId: number | "") => {
+    setSelectedParent(parentId);
+    setData("category_id", ""); // Resetear la subcategoría seleccionada
+  };
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
@@ -144,18 +156,46 @@ export default function PublicationCreate({
 
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <FormControl fullWidth error={!!errors.category_id}>
-                    <InputLabel>Categoría</InputLabel>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Categoría Principal</InputLabel>
+                    <Select
+                      value={selectedParent}
+                      label="Categoría Principal"
+                      onChange={e => handleParentChange(e.target.value as number)}
+                      required
+                    >
+                      <MenuItem value="">
+                        <em>Selecciona una categoría</em>
+                      </MenuItem>
+                      {parentCategories.map(category => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.icon} {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <FormControl
+                    fullWidth
+                    error={!!errors.category_id}
+                    disabled={!selectedParent}
+                  >
+                    <InputLabel>Subcategoría</InputLabel>
                     <Select
                       value={data.category_id}
-                      label="Categoría"
+                      label="Subcategoría"
                       onChange={e => setData("category_id", e.target.value)}
                       required
                     >
-                      {availableCategories.map(category => (
+                      <MenuItem value="">
+                        <em>Selecciona una subcategoría</em>
+                      </MenuItem>
+                      {childCategories.map(category => (
                         <MenuItem key={category.id} value={category.id}>
-                          {category.icon} {category.name}
+                          {category.name}
                         </MenuItem>
                       ))}
                     </Select>
